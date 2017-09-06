@@ -7,6 +7,9 @@
     position:relative;
     margin:auto;
 }
+.margin-left-lg{
+    margin-left:3em;
+}
 .flex{
   display: flex;
 }
@@ -115,7 +118,6 @@ position: absolute;
                             <label for="operator.name">{{ operator.name }}</label>
                 </div>
                 <button class="margin-sm" @click="initGame">התחל</button>
-                <button class="margin-sm" @click="delHist">מחק</button>
             </div>
         </div>
     </transition >
@@ -134,10 +136,12 @@ position: absolute;
         </div>
     </transition>
         <div class="field flex row center">
-                    <div class="field">{{answers.currects}} :נכון</div>
-                    <div class="field">{{answers.wrongs}} :לא נכון</div>
-                    <div class="field">{{answers.wrongs+answers.currects}} :סך הכל</div>
-           </div>
+            <div class="field">{{answers.currects}} :נכון</div>
+            <div class="field">{{answers.wrongs}} :לא נכון</div>
+            <div class="field">{{answers.wrongs+answers.currects}} :סך הכל</div>
+            <button v-if="exams.length>0" class="margin-left-lg" @click="delHist">מחק</button>
+        </div>
+
         <div  :class="[ idx==0  ? 'lastExam border-bottom': '', 'field flex row ']" 
                 v-for="(exam,idx) in exams">
             <!--<transition name="fade">-->
@@ -182,6 +186,8 @@ new Vue({
         this.currNum2=0;
         this.answers={currects:0, wrongs:0};
         this.isSettings =false;
+        document.getElementsByClassName("res-input")[0].focus();
+
       },
       initGame(){
             this.creatExam();
