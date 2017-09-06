@@ -5,6 +5,7 @@
     max-width:600px;
     border:1px solid black;
     position:relative;
+    margin:auto;
 }
 .flex{
   display: flex;
@@ -20,10 +21,14 @@
 }
 .lastExam{
   background-color: lightblue;
+  border-bottom: 3px solid black;
+}
+.border-bottom{
+  border-bottom: 3px solid black;
 }
 .field{
     margin:.3em;
-    border:1px solid green;
+    /*border:1px solid green;*/
     font-size:1.2em;
     /*width:4em;*/
 }
@@ -62,6 +67,12 @@ input{
 .self-align-end{
     align-self: flex-end;
 }
+.width10{
+    width:10em;
+}
+.width100-per{
+    width:100%;
+}
 .right-top{
 position: absolute;
     /*background: red;*/
@@ -82,18 +93,21 @@ position: absolute;
   </head>
   <body>
 <div id="container">
-    <div class="">
+    <div class="border-bottom">
         <button class="right-top" @click="isSettings=!isSettings">
             <img :src= "settingsPng" alt="settings" height="30" width="30">
         </button>
-        <h1 class="text-align-center">התרגילים של נחשון</h1>
+        <h1 class="text-align-center">התרגילים של {{studentName}}</h1>
     </div>
     <!--=======================SETTINGS AREA============================-->
     <transition name="fade">
-        <div v-if="isSettings" class="field flex col center">
+        <div v-if="isSettings" class="field flex col center border-bottom">
+            <div  class="field flex row center ">
+                <input   class="width10 " v-model="studentName"  placeholder="שם התלמיד" :bind="studentName">:שם התלמיד  </input>
+            </div>
             <div  class="field flex row center">
-                <input   class="width3" v-model="minNum"  placeholder="ממספר" :bind="minNum">  ממספר </input>
                 <input   class="width3 margin-left-sm" v-model="maxNum" placeholder="עד מספר"  :bind="maxNum"> עד מספר </input>
+                <input   class="width3" v-model="minNum"  placeholder="ממספר" :bind="minNum">  ממספר </input>
             </div>
             <div class="field flex row center">
                 <div class="margin-sm" v-for="(operator,idx) in operators">
@@ -101,6 +115,7 @@ position: absolute;
                             <label for="operator.name">{{ operator.name }}</label>
                 </div>
                 <button class="margin-sm" @click="initGame">התחל</button>
+                <button class="margin-sm" @click="delHist">מחק</button>
             </div>
         </div>
     </transition >
@@ -123,12 +138,12 @@ position: absolute;
                     <div class="field">{{answers.wrongs}} :לא נכון</div>
                     <div class="field">{{answers.wrongs+answers.currects}} :סך הכל</div>
            </div>
-        <div  :class="[ idx==0  ? 'lastExam': '', 'field flex row ']" 
+        <div  :class="[ idx==0  ? 'lastExam border-bottom': '', 'field flex row ']" 
                 v-for="(exam,idx) in exams">
             <!--<transition name="fade">-->
                 <div class="field" >{{idx+1}}: {{exam.num2}}{{exam.operator.id}}{{exam.num1}} = {{exam.currectRes}} </div>
                 <div v-if="exam.resBul" class="field">נכון</div> 
-                <div v-else class="field danger">{{exam.enterdrRes}} :לא נכון, נחשון חשב</div>
+                <div v-else class="field danger">{{exam.enterdrRes}} :לא נכון, {{studentName}} חשב</div>
             <!--</transition>-->
       </div>
 </div>
@@ -141,6 +156,7 @@ new Vue({
     name: 'Grading',
   data() {
     return {
+      studentName:'נחשון',
       isGameOn:false,
       isSettings:true,
       settingsPng:'https://image.flaticon.com/icons/png/512/22/22377.png',
@@ -151,7 +167,6 @@ new Vue({
       currNum2:0,
       currOperator:'',
       res:null,
-      exams:[],
       operators:[{id:'+',bul:true, name:'חיבור'},{id:'-',bul:true, name:'חיסור'},
                 {id:'X',bul:false, name:'כפל'},{id:'/',bul:false, name:'חילוק'}],
       answers:{currects:0, wrongs:0},
@@ -161,6 +176,13 @@ new Vue({
     // this.creatExam()
   },
   methods: {
+      delHist(){
+        this.exams= [];
+        this.currNum1=0;
+        this.currNum2=0;
+        this.answers={currects:0, wrongs:0};
+        this.isSettings =false;
+      },
       initGame(){
             this.creatExam();
             this.isGameOn=true;
@@ -205,8 +227,9 @@ new Vue({
             }
        },
        resExam(){
-           console.log(typeof(parseInt(this.res)));
-           console.log(typeof(this.res));//
+          document.getElementsByClassName("res-input")[0].focus();
+        //    console.log(typeof(parseInt(this.res)));
+        //    console.log(typeof(this.res));//
            if(!this.res || isNaN(this.res)) return;
         //    if(!this.res || typeof(this.res) !='number' || this.res == 'NaN') return;
 
@@ -226,7 +249,6 @@ new Vue({
           this.exams.unshift(obj);
           this.res = null;
           this.creatExam();
-          document.getElementsByClassName("res-input")[0].focus();
     }
   },
 })
