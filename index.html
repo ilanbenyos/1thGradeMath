@@ -1,6 +1,10 @@
 <html>
   <head>
-<style scoped>
+<style>
+#container{
+    max-width:600px;
+    border:1px solid black;
+}
 .flex{
   display: flex;
 }
@@ -9,6 +13,9 @@
 }
 .col{
   flex-direction: column;
+}
+.center{
+    justify-content: center;
 }
 .lastExam{
   background-color: lightblue;
@@ -23,34 +30,68 @@
     display:flex;
     flex-direction: row;
 }
+.width5{
+    width:5em;
+}
+.width3{
+    width:3em;
+}
+.margin-sm{
+    margin-left:1em;
+}
+.danger{
+    background-color: red;
+}
+.margin-left-sm{
+    margin-left:2em;
+}
+.text-align-center{
+    text-align:center;
+}
+input{
+    font-size: 1.3em;
+    text-align: right;
+}
 *{
-  outline:1px solid red;
+  /*outline:1px solid red;*/
 }
 </style>
   </head>
   <body>
 <div id="container">
-  <section>
-    <h1 class="">התרגילים של נחשון</h1>
-      <div class="field flex row">
+    <h1 class="text-align-center">התרגילים של נחשון</h1>
+    <div class="field flex row center">
+        <input   class="width3" v-model="minNum"  placeholder="ממספר" :bind="minNum"> ממספר </input>
+        <input   class="width3 margin-left-sm" v-model="maxNum" placeholder="עד מספר"  :bind="maxNum"> עד מספר </input>
+    </div>
+    <div class="field flex row center">
+        <div class="margin-sm" v-for="(operator,idx) in operators">
+            <input type="checkbox" id="operator.bul" v-model="operator.bul">
+                    <label for="operator.name">{{ operator.name }}</label>
+        </div>
+        <button class="margin-sm" @click="initGame">התחל</button>
+    </div>
+    <div v-if="isGameOn" class="field flex row center">
           <div class="field">{{currNum2}}</div>
-          <div class="field">+</div>
+          <div class="field">{{currOperator.id}}</div>
           <div class="field">{{currNum1}}</div>
           <div class="field">=</div>
           <input  @keyup.enter="resExam" class="input" v-model="res"></input>
           <button @click="resExam">פתור!!</button>
-      </div>
-           <div class="line">
+
+    </div>
+           <div class="field flex row center">
                     <div class="field">{{answers.currects}} :נכון</div>
                     <div class="field">{{answers.wrongs}} :לא נכון</div>
+                    <div class="field">{{answers.wrongs+answers.currects}} :סך הכל</div>
            </div>
-        <div  :class="[ idx==0  ? 'lastExam': '', 'field flex row']" v-for="(exam,idx) in exams">
-          <div class="field" >{{idx+1}}: {{exam.num2}}+{{exam.num1}} = {{exam.num2+exam.num1}} </div>
+        <div  :class="[ idx==0  ? 'lastExam': '', 'field flex row']" 
+                v-for="(exam,idx) in exams">
+          <div class="field" >{{idx+1}}: {{exam.num2}}{{exam.operator.id}}{{exam.num1}} = {{exam.currectRes}} </div>
 
-          <div v-if="((exam.num2+exam.num1) === exam.enterdrRes)" class="field">נכון</div> 
-          <div v-else class="field">{{exam.res}} :לא נכון, נחשון חשב</div>
+          <div v-if="exam.resBul" class="field">נכון</div> 
+          <div v-else class="field danger">{{exam.enterdrRes}} :לא נכון, נחשון חשב</div>
       </div>
-  </section>
 </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.2/vue.min.js"></script>
@@ -61,28 +102,43 @@ new Vue({
     name: 'Grading',
   data() {
     return {
+      isGameOn:false,
       exams:[],
       minNum:20,
       maxNum:50,
       currNum1:0,
       currNum2:0,
+      currOperator:'',
       res:null,
       exams:[],
+      operators:[{id:'+',bul:true, name:'חיבור'},{id:'-',bul:true, name:'חיסור'},
+                {id:'X',bul:false, name:'כפל'},{id:'/',bul:false, name:'חילוק'}],
       answers:{currects:0, wrongs:0},
-      operator:''
-      
-    }
+   }
   },
   created () {
-    this.creatExam()
+    // this.creatExam()
   },
   methods: {
+      initGame(){
+            this.creatExam();
+            this.isGameOn=true;
+
+      },
     getRandNum(min,max){
-      return (Math.floor(Math.random() * max) + min) 
+      var rand=  Math.floor(Math.random()*(max-min+1)+min);
+      return rand;
+    },
+    getOperator(){
+       var operatorsOpt = this.operators.filter((op)=>{return op.bul===true })
+       return operatorsOpt[this.getRandNum(0,operatorsOpt.length-1)]
     },
     creatExam(){
        var num1 = this.getRandNum(this.minNum,this.maxNum);
        var num2 = this.getRandNum(this.minNum,this.maxNum);
+       var operatorsOpt = this.operators.filter((op)=>{return op.bul===true });
+       this.currOperator = this.getOperator();
+       console.log(this.currOperator.id);
        this.currNum1 =num1;
        this.currNum2 =num2;
        if(num1>num2){
@@ -91,13 +147,38 @@ new Vue({
        }
       //  this.res = num1-num2;
        },
+       getCorrectAnswer(num1,num2){
+            switch(this.currOperator.id){
+                case '+':
+                    return num2+num1
+                break;
+                case '-':
+                    return num2-num1
+                break;
+                case '/':
+                    return num2/num1
+                break;
+                case 'X':
+                    return num2*num1
+                break;
+            }
+       },
        resExam(){
+           if(!this.res) return;
+
          var num1=this.currNum1;
          var num2=this.currNum2;
-         var currectRes = num2 +num1;
+         var currectRes = this.getCorrectAnswer(this.currNum1,this.currNum2);
          var enterdrRes = +this.res;
-         (enterdrRes ==currectRes)?this.answers.currects++ : this.answers.wrongs++;
-          var obj = {num1,num2,enterdrRes,res:this.res}
+         var resBul = true;
+         var operator = this.currOperator
+         if(enterdrRes ==currectRes){
+                this.answers.currects++ ;
+          }else{
+               this.answers.wrongs++;
+               resBul=false;
+          }
+          var obj = {num1,num2,enterdrRes,resBul,operator,currectRes}
           this.exams.unshift(obj);
           this.res = null;
           this.creatExam();
