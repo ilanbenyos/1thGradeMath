@@ -52,6 +52,18 @@ input{
     font-size: 1.3em;
     text-align: right;
 }
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0
+}
+@media screen and (max-width: 450px) {
+    .col1{
+        flex-direction: column;
+    }
+
+}
 *{
   /*outline:1px solid red;*/
 }
@@ -61,7 +73,7 @@ input{
 <div id="container">
     <h1 class="text-align-center">התרגילים של נחשון</h1>
     <div class="field flex row center">
-        <input   class="width3" v-model="minNum"  placeholder="ממספר" :bind="minNum"> ממספר </input>
+        <input   class="width3" v-model="minNum"  placeholder="ממספר" :bind="minNum">  ממספר </input>
         <input   class="width3 margin-left-sm" v-model="maxNum" placeholder="עד מספר"  :bind="maxNum"> עד מספר </input>
     </div>
     <div class="field flex row center">
@@ -71,26 +83,31 @@ input{
         </div>
         <button class="margin-sm" @click="initGame">התחל</button>
     </div>
-    <div v-if="isGameOn" class="field flex row center">
-          <div class="field">{{currNum2}}</div>
-          <div class="field">{{currOperator.id}}</div>
-          <div class="field">{{currNum1}}</div>
-          <div class="field">=</div>
-          <input  @keyup.enter="resExam" class="input" v-model="res"></input>
-          <button @click="resExam">פתור!!</button>
-
-    </div>
-           <div class="field flex row center">
+    <transition name="fade">
+        <div v-if="isGameOn" class="field flex row center">
+            <div class=" flex row center">
+            
+                <div class="field">{{currNum2}}</div>
+                <div class="field">{{currOperator.id}}</div>
+                <div class="field">{{currNum1}}</div>
+                <div class="field">=</div>
+            </div>
+            <input  @keyup.enter="resExam" class="input width3" v-model="res"></input>
+            <button @click="resExam">פתור!!</button>
+        </div>
+    </transition>
+        <div class="field flex row center">
                     <div class="field">{{answers.currects}} :נכון</div>
                     <div class="field">{{answers.wrongs}} :לא נכון</div>
                     <div class="field">{{answers.wrongs+answers.currects}} :סך הכל</div>
            </div>
-        <div  :class="[ idx==0  ? 'lastExam': '', 'field flex row']" 
+        <div  :class="[ idx==0  ? 'lastExam': '', 'field flex row ']" 
                 v-for="(exam,idx) in exams">
-          <div class="field" >{{idx+1}}: {{exam.num2}}{{exam.operator.id}}{{exam.num1}} = {{exam.currectRes}} </div>
-
-          <div v-if="exam.resBul" class="field">נכון</div> 
-          <div v-else class="field danger">{{exam.enterdrRes}} :לא נכון, נחשון חשב</div>
+            <!--<transition name="fade">-->
+                <div class="field" >{{idx+1}}: {{exam.num2}}{{exam.operator.id}}{{exam.num1}} = {{exam.currectRes}} </div>
+                <div v-if="exam.resBul" class="field">נכון</div> 
+                <div v-else class="field danger">{{exam.enterdrRes}} :לא נכון, נחשון חשב</div>
+            <!--</transition>-->
       </div>
 </div>
 
@@ -164,7 +181,10 @@ new Vue({
             }
        },
        resExam(){
-           if(!this.res) return;
+           console.log(typeof(parseInt(this.res)));
+           console.log(typeof(this.res));//
+           if(!this.res || isNaN(this.res)) return;
+        //    if(!this.res || typeof(this.res) !='number' || this.res == 'NaN') return;
 
          var num1=this.currNum1;
          var num2=this.currNum2;
