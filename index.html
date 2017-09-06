@@ -4,6 +4,7 @@
 #container{
     max-width:600px;
     border:1px solid black;
+    position:relative;
 }
 .flex{
   display: flex;
@@ -58,6 +59,16 @@ input{
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0
 }
+.self-align-end{
+    align-self: flex-end;
+}
+.right-top{
+position: absolute;
+    /*background: red;*/
+    /*color: white;*/
+    top: 5px;
+    right: 5px;    
+}
 @media screen and (max-width: 450px) {
     .col1{
         flex-direction: column;
@@ -71,18 +82,29 @@ input{
   </head>
   <body>
 <div id="container">
-    <h1 class="text-align-center">התרגילים של נחשון</h1>
-    <div class="field flex row center">
-        <input   class="width3" v-model="minNum"  placeholder="ממספר" :bind="minNum">  ממספר </input>
-        <input   class="width3 margin-left-sm" v-model="maxNum" placeholder="עד מספר"  :bind="maxNum"> עד מספר </input>
+    <div class="">
+        <button class="right-top" @click="isSettings=!isSettings">
+            <img :src= "settingsPng" alt="settings" height="30" width="30">
+        </button>
+        <h1 class="text-align-center">התרגילים של נחשון</h1>
     </div>
-    <div class="field flex row center">
-        <div class="margin-sm" v-for="(operator,idx) in operators">
-            <input type="checkbox" id="operator.bul" v-model="operator.bul">
-                    <label for="operator.name">{{ operator.name }}</label>
+    <!--=======================SETTINGS AREA============================-->
+    <transition name="fade">
+        <div v-if="isSettings" class="field flex col center">
+            <div  class="field flex row center">
+                <input   class="width3" v-model="minNum"  placeholder="ממספר" :bind="minNum">  ממספר </input>
+                <input   class="width3 margin-left-sm" v-model="maxNum" placeholder="עד מספר"  :bind="maxNum"> עד מספר </input>
+            </div>
+            <div class="field flex row center">
+                <div class="margin-sm" v-for="(operator,idx) in operators">
+                    <input type="checkbox" id="operator.bul" v-model="operator.bul">
+                            <label for="operator.name">{{ operator.name }}</label>
+                </div>
+                <button class="margin-sm" @click="initGame">התחל</button>
+            </div>
         </div>
-        <button class="margin-sm" @click="initGame">התחל</button>
-    </div>
+    </transition >
+    <!--=======================EXAMS AREA============================-->
     <transition name="fade">
         <div v-if="isGameOn" class="field flex row center">
             <div class=" flex row center">
@@ -92,7 +114,7 @@ input{
                 <div class="field">{{currNum1}}</div>
                 <div class="field">=</div>
             </div>
-            <input  @keyup.enter="resExam" class="input width3" v-model="res"></input>
+            <input  @keyup.enter="resExam " class="input width3 res-input" v-model="res" autofocus></input>
             <button @click="resExam">פתור!!</button>
         </div>
     </transition>
@@ -120,6 +142,8 @@ new Vue({
   data() {
     return {
       isGameOn:false,
+      isSettings:true,
+      settingsPng:'https://image.flaticon.com/icons/png/512/22/22377.png',
       exams:[],
       minNum:20,
       maxNum:50,
@@ -140,7 +164,7 @@ new Vue({
       initGame(){
             this.creatExam();
             this.isGameOn=true;
-
+            this.isSettings =false;
       },
     getRandNum(min,max){
       var rand=  Math.floor(Math.random()*(max-min+1)+min);
@@ -202,6 +226,7 @@ new Vue({
           this.exams.unshift(obj);
           this.res = null;
           this.creatExam();
+          document.getElementsByClassName("res-input")[0].focus();
     }
   },
 })
