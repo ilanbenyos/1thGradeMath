@@ -25,6 +25,9 @@
 .center{
     justify-content: center;
 }
+.center-ver{
+    align-items: center;
+}
 .lastExam{
   background-color: lightblue;
   border-bottom: 3px solid black;
@@ -50,6 +53,21 @@
 }
 .margin-sm{
     margin-left:1em;
+}
+.icon{
+    width:1.5em;
+    height:1.5em;
+    width:60px;
+    /*height:90px;*/
+    overflow: hidden;
+    /*outline:1px solid red;*/
+    margin-left:20px;
+}
+.img-icon{
+    /*width:100%;*/
+    max-height:100%;
+    margin:auto;
+  display:block;
 }
 .danger{
     background-color: red;
@@ -86,9 +104,23 @@ position: absolute;
     top: 5px;
     right: 5px;    
 }
+.lg-hide{
+    display:none;
+}
+.sm-hide{
+    display:initial;
+}
+.settings{
+    margin-top:25px;
+    margin-bottom:25px;
+}
+.space-around{
+    justify-content:  space-around ; 
+}
 @media  screen and (max-device-width: 480px) {
     .header{
         margin-bottom:25px;
+        font-size: 84px;
     }
     input{
         /*font-size:68px;*/
@@ -101,11 +133,25 @@ position: absolute;
         margin-top:1em;
         margin-bottom:1em;
     }
+    .translate-label-sm{
+        transform: translate(-38%,-38%);
+    }
+    .icon{
+        width:60px;
+        height:initial;
+    }
+    .img-icon{
+        width:100%;
+    }
+
     .btn-sm{
         font-size:58px;
         margin-bottom:25px;
     }
-
+    .btn-top-right-sm{
+        width:7em;
+        height:7em;
+    }
     .text-align-right-sm{
         text-align: end;
     }
@@ -142,24 +188,30 @@ position: absolute;
    .margin-left-sm0{
        margin-left:initial;
    }
+    .sm-hide{
+        display:none;
+    }
+    .lg-hide{
+        display:initial;
+    }
 
 }
 *{
-  /*outline:1px solid red;*/
+    /*outline:1px solid red;*/
 }
 </style>
   </head>
   <body>
 <div id="container">
     <div class="border-bottom">
-        <button class="right-top" @click="isSettings=!isSettings">
+        <button class="right-top btn-top-right-sm" @click="isSettings=!isSettings">
             <img :src= "settingsPng" alt="settings" height="30" width="30">
         </button>
-        <h1 class="header text-align-center font-size-md-1">התרגילים של {{studentName}}</h1>
+        <h1 class="header text-align-center">התרגילים של {{studentName}}</h1>
     </div>
     <!--=======================SETTINGS AREA============================-->
     <transition name="fade">
-        <div v-if="isSettings" class=" flex col center border-bottom">
+        <div v-if="isSettings" class="settings flex col center border-bottom ">
                 <div  class="field flex row center font-size-md-1 col1-rev width-sm-100-per">
                 <input   class="width5 width-sm-100-per" v-model="studentName"  placeholder="שם התלמיד" :bind="studentName"> </input>
                 <div class=" text-align-right-sm">:שם התלמיד </div>
@@ -176,12 +228,12 @@ position: absolute;
                 </div>
             </div>
             <div class="field flex row col1 center">
-                <div class=" flex row ">
-                    <div class="margin-sm checkbox-pnl" v-for="(operator,idx) in operators">
+                <div class=" flex row center">
+                    <div class="margin-sm checkbox-pnl flex row col1-rev" v-for="(operator,idx) in operators">
                         <input type="checkbox" id="operator.bul" v-model="operator.bul">
-                                <label for="operator.name">{{ operator.name }}</label>
+                                <label class="translate-label-sm" for="operator.name">{{ operator.name }}</label>
                     </div>
-                </div>
+                </div>    
                 <button class="margin-sm btn-sm" @click="initGame">התחל</button>
             </div>
         </div>
@@ -209,12 +261,22 @@ position: absolute;
             <button v-if="exams.length>0" class="margin-left-lg margin-left-sm0 btn-sm" @click="delHist">מחק</button>
         </div>
 
-        <div  :class="[ idx==0  ? 'lastExam border-bottom': '', 'field flex row ']" 
+        <div  :class="[ idx==0  ? 'lastExam border-bottom': '', 'field flex row space-around']" 
                 v-for="(exam,idx) in exams">
             <!--<transition name="fade">-->
-                <div class="field" >{{exams.length - idx}}: {{exam.num2}}{{exam.operator.id}}{{exam.num1}} = {{exam.currectRes}} </div>
-                <div v-if="exam.resBul" class="field">נכון</div> 
-                <div v-else class="field danger">{{exam.enterdrRes}} :לא נכון, {{studentName}} חשב</div>
+                <div class="field" >{{exams.length - idx}}: </div>
+                <div class="field" > {{exam.num2}}{{exam.operator.id}}{{exam.num1}} = {{exam.currectRes}} </div>
+                <div v-if="exam.resBul" class="flex row center center-ver">
+                    <div class="icon">
+                        <img class="img-icon" :src= "vPng" alt="wrong" >
+                    </div>
+                </div>
+                <div v-else class="flex row center center-ver">
+                        {{exam.enterdrRes}}
+                    <div class="icon">
+                        <img class="img-icon" :src= "xPng" alt="wrong" >
+                    </div>
+                </div>
             <!--</transition>-->
       </div>
 </div>
@@ -231,6 +293,8 @@ new Vue({
       isGameOn:false,
       isSettings:true,
       settingsPng:'https://image.flaticon.com/icons/png/512/22/22377.png',
+      vPng:'https://vignette4.wikia.nocookie.net/sims/images/0/06/Icon_yes_check_v.svg/revision/latest?cb=20100731224125',
+      xPng:'https://openclipart.org/image/2400px/svg_to_png/16155/milker-X-icon.png',
       exams:[],
       minNum:20,
       maxNum:50,
