@@ -262,21 +262,22 @@ input[type="checkbox"]:checked + label:after {
     /*outline:1px solid red;*/
 }
 </style>
-  </head>
+</head>
   <body>
-<div id="container">
+<div id="container" class="king_nadav">
     <div class="border-bottom">
-        <button class="btn right-top btn-top-right-sm" @click="isSettings=!isSettings">
+        <button class="btn right-top btn-top-right-sm" @click="isSettingsOpen=!isSettingsOpen">
             <img :src= "settingsPng" alt="settings" height="30" width="30">
         </button>
         <h1 class="header text-align-center">התרגילים של {{studentName}}</h1>
+        <h3>{{isSettingsOpen}}</h3>
     </div>
     <!--=======================SETTINGS AREA============================-->
     <transition name="fade">
-        <div v-if="isSettings" class="settings flex col center border-bottom ">
+        <div v-if="isSettingsOpen" class="settings flex col center border-bottom ">
             <div  class="settings flex row center col1">
                 <div  class="field flex row center font-size-md-1 col1-rev width-sm-100-per">
-                    <input   class="width5 width-sm-100-per" v-model="studentName"  placeholder="שם התלמיד" :bind="studentName"> </input>
+                    <input   class="width5 width-sm-100-per" v-model="studentName"  placeholder="שם התלמיד"> </input>
                     <div class=" text-align-right-sm">:שם התלמיד </div>
                 </div>
             <!--<div  class=" flex row center col1-rev ">-->
@@ -335,7 +336,7 @@ input[type="checkbox"]:checked + label:after {
             <div class=" flex row center ">
                 <div class="field">{{answers.currects}} :נכון</div>
                 <div class="field">{{answers.wrongs}} :לא נכון</div>
-                <div class="field">{{answers.wrongs+answers.currects}} :סך הכל</div>
+                <div class="field">{{totalAnswers}} :סך הכל</div>
             </div>
         </div>
 
@@ -371,7 +372,7 @@ new Vue({
     return {
       studentName:'הגר',
       isGameOn:false,
-      isSettings:true,
+      isSettingsOpen:true,
       settingsPng:'https://image.flaticon.com/icons/png/512/22/22377.png',
       vPng:'https://vignette4.wikia.nocookie.net/sims/images/0/06/Icon_yes_check_v.svg/revision/latest?cb=20100731224125',
       xPng:'https://openclipart.org/image/2400px/svg_to_png/16155/milker-X-icon.png',
@@ -390,6 +391,11 @@ new Vue({
   },
   created () {
     // this.creatExam()
+  },
+  computed:{
+    totalAnswers(){
+        return this.answers.wrongs + this.answers.currects
+    }
   },
   methods: {
       initRes(){
@@ -411,14 +417,14 @@ new Vue({
         this.currNum1=0;
         this.currNum2=0;
         this.answers={currects:0, wrongs:0};
-        this.isSettings =false;
+        this.isSettingsOpen =false;
         this.initGame();
         document.getElementsByClassName("res-input")[0].focus();
       },
       initGame(){
             this.creatExam();
             this.isGameOn=true;
-            this.isSettings =false;
+            this.isSettingsOpen =false;
       },
     getRandNum(min,max){
       var rand=  Math.floor(Math.random()*(max-min+1)+min);
